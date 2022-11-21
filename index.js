@@ -15,24 +15,24 @@ app.use(express.json())
 
 
 
-// function jwtVerify(req, res, next) {
-//     const authHeader = req.headers.authorization
-//     if (!authHeader) {
-//         return res.status(401).send({ message: 'Access denied! unauthorized access' })
-//     }
+function jwtVerify(req, res, next) {
+    const authHeader = req.headers.authorization
+    if (!authHeader) {
+        return res.status(401).send({ message: 'Access denied! unauthorized access' })
+    }
 
-//     else {
-//         const token = authHeader.split(' ')[1]
-//         jwt.verify(token, process.env.ACCESS_JWTTOKEN, (err, decoded) => {
-//             if (err) {
-//                 return res.status(403).send({ message: 'Access denied! Forbidden access' })
-//             }
-//             console.log('decoded', decoded);
-//             req.decoded = decoded
-//         })
-//         next()
-//     }
-// }
+    else {
+        const token = authHeader.split(' ')[1]
+        jwt.verify(token, process.env.ACCESS_JWTTOKEN, (err, decoded) => {
+            if (err) {
+                return res.status(403).send({ message: 'Access denied! Forbidden access' })
+            }
+            console.log('decoded', decoded);
+            req.decoded = decoded
+        })
+        next()
+    }
+}
 
 
 
@@ -50,20 +50,20 @@ const run = async () => {
 
 
         // jwt
-        // app.post('/signup', async (req, res) => {
-        //     const user = req.body
-        //     const accessJwtToken = jwt.sign(user, process.env.ACCESS_JWTTOKEN, {
-        //         expiresIn: '10d'
-        //     })
-        //     res.send({ accessJwtToken })
-        // })
-        // app.post('/login', async (req, res) => {
-        //     const user = req.body
-        //     const accessJwtToken = jwt.sign(user, process.env.ACCESS_JWTTOKEN, {
-        //         expiresIn: '10d'
-        //     })
-        //     res.send({ accessJwtToken })
-        // })
+        app.post('/signup', async (req, res) => {
+            const user = req.body
+            const accessJwtToken = jwt.sign(user, process.env.ACCESS_JWTTOKEN, {
+                expiresIn: '10d'
+            })
+            res.send({ accessJwtToken })
+        })
+        app.post('/login', async (req, res) => {
+            const user = req.body
+            const accessJwtToken = jwt.sign(user, process.env.ACCESS_JWTTOKEN, {
+                expiresIn: '10d'
+            })
+            res.send({ accessJwtToken })
+        })
 
         // All product get
         app.get('/dress', async (req, res) => {
@@ -105,7 +105,7 @@ const run = async () => {
         })
 
         // Filter product by email
-        app.get('/mydress', async (req, res) => {
+        app.get('/mydress', jwtVerify, async (req, res) => {
             const emailDecoded = req.decoded.email
             const email = req.query.email
             if (email === emailDecoded) {
